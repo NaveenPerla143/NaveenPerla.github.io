@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShotVibely — Photography & Tech</title>
+  <meta name="description" content="Capturing the world. Decoding the future. Photography, Tech News and Digital Stories."/>
+  <meta property="og:title" content="ShotVibely — Photography & Tech"/>
+  <meta property="og:description" content="Photography • Technology • News"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Share+Tech+Mono&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #020208;
+      --bg2: #080812;
+      --bg3: #0d0d1c;
+      --pink: #ff2d78;
+      --cyan: #00e5ff;
+      --purple: #b44fff;
+      --white: #eef0ff;
+      --muted: #5a5a7a;
+      --muted2: #8888aa;
+      --card: #0c0c1a;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CURSOR */
+    .cursor { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; position: fixed; top:0; left:0; pointer-events:none; z-index:9999; mix-blend-mode: screen; transition: width .2s, height .2s; }
+    .cursor-ring { width: 32px; height: 32px; border: 1px solid rgba(0,229,255,0.35); border-radius: 50%; position: fixed; top:0; left:0; pointer-events:none; z-index:9998; transition: transform .16s ease, width .2s, height .2s, border-color .2s; }
+    .cursor.hov { width: 14px; height: 14px; background: var(--pink); }
+    .cursor-ring.hov { width: 48px; height: 48px; border-color: rgba(255,45,120,0.4); }
+
+    /* SCANLINE */
+    body::after {
+      content: '';
+      position: fixed; inset:0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none;
+      z-index: 998;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:200;
+      padding: 20px 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(2,2,8,0.82);
+      backdrop-filter: blur(24px);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 14px;
+      text-decoration: none;
+    }
+    .nav-logo-img {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid rgba(0,229,255,0.2);
+    }
+    .nav-brand-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 17px;
+      background: linear-gradient(90deg, var(--cyan), var(--pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: 0.04em;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-ig {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 0.1em;
+      color: var(--white); text-decoration: none;
+      border: 1px solid var(--border2); padding: 9px 18px; border-radius: 6px;
+      transition: border-color .2s, background .2s, color .2s;
+      position: relative; overflow: hidden;
+    }
+    .nav-ig::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,229,255,0.08), rgba(255,45,120,0.08));
+      opacity: 0; transition: opacity .2s;
+    }
+    .nav-ig:hover { border-color: var(--cyan); color: var(--cyan); }
+    .nav-ig:hover::before { opacity: 1; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 0;
+      padding: 120px 52px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .hero-glow1 { position:absolute; width:500px; height:500px; border-radius:50%; background:var(--pink); filter:blur(140px); opacity:.07; top:0; right:0; pointer-events:none; }
+    .hero-glow2 { position:absolute; width:400px; height:400px; border-radius:50%; background:var(--cyan); filter:blur(140px); opacity:.06; bottom:0; left:0; pointer-events:none; }
+
+    .hero-left { position: relative; z-index: 2; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 28px;
+      opacity: 0; animation: fadeUp .7s .2s forwards;
+    }
+    .hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--cyan); }
+    .hero-h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(44px, 6vw, 80px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      opacity: 0; animation: fadeUp .7s .35s forwards;
+    }
+    .h1-shot { color: var(--cyan); }
+    .h1-vibe {
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .h1-ly { color: rgba(238,240,255,0.18); }
+    .hero-desc {
+      font-size: 16px; color: var(--muted2); line-height: 1.8;
+      max-width: 420px; margin-bottom: 40px;
+      opacity: 0; animation: fadeUp .7s .5s forwards;
+    }
+    .hero-tags {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 44px;
+      opacity: 0; animation: fadeUp .7s .62s forwards;
+    }
+    .tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 7px 14px; border-radius: 4px;
+      border: 1px solid var(--border2); color: var(--muted2);
+      transition: border-color .2s, color .2s;
+    }
+    .tag:hover { border-color: var(--cyan); color: var(--cyan); }
+    .tag.t-active { border-color: var(--pink); color: var(--pink); background: rgba(255,45,120,0.07); }
+    .hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .7s .75s forwards;
+    }
+    .btn-p {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; padding: 14px 26px; border-radius: 6px;
+      position: relative; overflow: hidden;
+      transition: color .2s, background .2s;
+    }
+    .btn-p::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--cyan); opacity: 0;
+      transition: opacity .2s;
+    }
+    .btn-p:hover { color: var(--bg); }
+    .btn-p:hover::before { opacity: 1; }
+    .btn-p span { position: relative; z-index: 1; }
+    .btn-p svg { position: relative; z-index: 1; }
+    .btn-s {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--muted2); text-decoration: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 14px 26px; border-radius: 6px;
+      border: 1px solid var(--border); transition: border-color .2s, color .2s;
+    }
+    .btn-s:hover { border-color: var(--border2); color: var(--white); }
+
+    /* HERO RIGHT — logo showcase */
+    .hero-right {
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 2;
+      opacity: 0; animation: fadeIn 1s .5s forwards;
+    }
+    .logo-frame {
+      position: relative;
+      width: clamp(280px, 38vw, 460px);
+      aspect-ratio: 1;
+    }
+    .logo-frame img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+      border: 1px solid rgba(0,229,255,0.15);
+      display: block;
+    }
+    .logo-corner { position: absolute; width: 20px; height: 20px; }
+    .lc-tl { top: -6px; left: -6px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); border-radius: 3px 0 0 0; }
+    .lc-tr { top: -6px; right: -6px; border-top: 2px solid var(--pink); border-right: 2px solid var(--pink); border-radius: 0 3px 0 0; }
+    .lc-bl { bottom: -6px; left: -6px; border-bottom: 2px solid var(--pink); border-left: 2px solid var(--pink); border-radius: 0 0 0 3px; }
+    .lc-br { bottom: -6px; right: -6px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); border-radius: 0 0 3px 0; }
+    .logo-scan {
+      position: absolute; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.6;
+      animation: scan 3s ease-in-out infinite;
+      border-radius: 20px;
+    }
+    .logo-badge {
+      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--cyan); white-space: nowrap;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo-badge::before, .logo-badge::after { content: ''; width: 24px; height: 1px; background: var(--cyan); opacity: 0.4; }
+
+    /* TICKER */
+    .ticker-wrap {
+      width: 100%; overflow: hidden;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--bg2); padding: 13px 0; position: relative; z-index: 2;
+    }
+    .ticker { display: flex; animation: ticker 30s linear infinite; width: max-content; }
+    .ticker-item {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); padding: 0 36px; white-space: nowrap;
+    }
+    .ticker-item em { color: var(--cyan); font-style: normal; margin-right: 10px; }
+
+    /* SECTIONS */
+    .section { padding: 100px 52px; max-width: 1260px; margin: 0 auto; position: relative; z-index: 2; }
+    .sec-eye {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sec-eye::before { content: '//'; color: var(--muted); }
+    .sec-h {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(30px, 4vw, 50px);
+      font-weight: 700; letter-spacing: -1.5px; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    /* ABOUT */
+    .about-wrap {
+      display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: center; margin-top: 60px;
+    }
+    .about-img-wrap { position: relative; }
+    .about-img {
+      width: 100%; border-radius: 16px;
+      border: 1px solid rgba(0,229,255,0.1);
+      object-fit: cover;
+      display: block;
+    }
+    .about-img-overlay {
+      position: absolute; inset: 0; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(0,229,255,0.04), rgba(255,45,120,0.04));
+      pointer-events: none;
+    }
+    .about-tag-float {
+      position: absolute; bottom: 20px; left: 20px;
+      background: rgba(2,2,8,0.85);
+      border: 1px solid var(--border2);
+      border-radius: 8px; padding: 12px 16px;
+      backdrop-filter: blur(12px);
+    }
+    .atf-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+    .atf-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--cyan); margin-top: 2px; }
+
+    .about-text p { color: var(--muted2); font-size: 16px; line-height: 1.85; margin-bottom: 20px; }
+    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 36px; }
+    .a-stat {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 22px 20px;
+      transition: border-color .2s, transform .2s;
+    }
+    .a-stat:hover { border-color: rgba(0,229,255,0.25); transform: translateY(-3px); }
+    .a-stat-n { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: var(--cyan); }
+    .a-stat-l { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+
+    /* PILLARS */
+    .pillars-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 60px; }
+    .pillar {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 36px 28px;
+      position: relative; overflow: hidden;
+      transition: transform .25s, border-color .25s;
+    }
+    .pillar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      opacity: 0; transition: opacity .25s;
+    }
+    .pillar:hover { transform: translateY(-6px); }
+    .pillar:hover::after { opacity: 1; }
+    .pi1::after { background: linear-gradient(90deg, var(--cyan), transparent); }
+    .pi2::after { background: linear-gradient(90deg, var(--pink), transparent); }
+    .pi3::after { background: linear-gradient(90deg, var(--purple), transparent); }
+    .pillar:hover.pi1 { border-color: rgba(0,229,255,0.2); }
+    .pillar:hover.pi2 { border-color: rgba(255,45,120,0.2); }
+    .pillar:hover.pi3 { border-color: rgba(180,79,255,0.2); }
+    .pillar-no {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 0.14em;
+      margin-bottom: 20px;
+    }
+    .n1 { color: var(--cyan); } .n2 { color: var(--pink); } .n3 { color: var(--purple); }
+    .pillar-icon { font-size: 28px; margin-bottom: 16px; }
+    .pillar-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .pillar-desc { font-size: 14px; color: var(--muted2); line-height: 1.75; }
+
+    /* GALLERY */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: 200px 200px;
+      gap: 14px; margin-top: 60px;
+    }
+    .g-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; position: relative;
+      transition: transform .3s, border-color .3s;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px;
+    }
+    .g-item:hover { transform: scale(1.02); z-index: 5; border-color: var(--border2); }
+    .g-item.g-big { grid-column: span 2; grid-row: span 2; }
+    .g-item.g-big img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 14px; }
+    .g-overlay {
+      position: absolute; inset: 0; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0,229,255,0.05), rgba(255,45,120,0.05));
+      opacity: 0; transition: opacity .3s;
+    }
+    .g-item:hover .g-overlay { opacity: 1; }
+    .g-ico { font-size: 28px; opacity: 0.25; }
+    .g-lbl { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .g1b { background: linear-gradient(135deg, #080018, #00100f); }
+    .g2b { background: linear-gradient(135deg, #100008, #080014); }
+    .g3b { background: linear-gradient(135deg, #001010, #000816); }
+    .g4b { background: linear-gradient(135deg, #100005, #080010); }
+    .g5b { background: linear-gradient(135deg, #060018, #000a14); }
+
+    /* CTA */
+    .cta-wrap {
+      margin: 0 52px 100px;
+      border: 1px solid var(--border); border-radius: 24px;
+      padding: 80px 60px; text-align: center;
+      position: relative; overflow: hidden; z-index: 2;
+      background: var(--bg2);
+    }
+    .cta-wrap::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent, transparent 58px, rgba(0,229,255,0.015) 59px, transparent 60px),
+                  repeating-linear-gradient(0deg, transparent, transparent 58px, rgba(0,229,255,0.015) 59px, transparent 60px);
+      pointer-events: none;
+    }
+    .cta-logo { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; margin: 0 auto 32px; border: 1px solid rgba(0,229,255,0.2); display: block; }
+    .cta-h { font-family: 'Syne', sans-serif; font-size: clamp(28px,4vw,48px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; }
+    .cta-h span { background: linear-gradient(90deg, var(--cyan), var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .cta-p { color: var(--muted2); font-size: 16px; margin-bottom: 40px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 36px 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 2;
+    }
+    .foot-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .foot-logo { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,229,255,0.15); }
+    .foot-name { font-family: 'Share Tech Mono', monospace; font-size: 14px; background: linear-gradient(90deg, var(--cyan), var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .foot-copy { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); }
+    .foot-ig { display: flex; align-items: center; gap: 8px; text-decoration: none; font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); transition: color .2s; }
+    .foot-ig:hover { color: var(--cyan); }
+
+    /* KEYFRAMES */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes ticker { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+    @keyframes scan { 0%,100% { top:8%; } 50% { top:90%; } }
+
+    .reveal { opacity:0; transform:translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.vis { opacity:1; transform:translateY(0); }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--cyan), var(--pink)); border-radius: 10px; }
+
+    @media (max-width: 960px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 110px 24px 60px; text-align: center; }
+      .hero-eyebrow { justify-content: center; }
+      .hero-tags, .hero-btns { justify-content: center; }
+      .hero-right { order: -1; margin-bottom: 40px; }
+      .logo-frame { width: 220px; }
+      .section { padding: 70px 24px; }
+      .about-wrap { grid-template-columns: 1fr; gap: 40px; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .g-item.g-big { grid-column: span 2; height: 220px; }
+      .cta-wrap { margin: 0 24px 70px; padding: 50px 24px; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 30px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cur"></div>
+  <div class="cursor-ring" id="curR"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-brand">
+      <img src="logo.png" alt="ShotVibely logo" class="nav-logo-img"/>
+      <span class="nav-brand-name">shotvibely</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#content">Content</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+    </ul>
+    <a href="https://www.instagram.com/shotvibely/" target="_blank" rel="noopener" class="nav-ig">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      @shotvibely
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow1"></div>
+    <div class="hero-glow2"></div>
+
+    <div class="hero-left">
+      <div class="hero-eyebrow">Photography × Technology × Stories</div>
+      <h1 class="hero-h1">
+        <span class="h1-shot">Shot</span><br/>
+        <span class="h1-vibe">Vibe</span><br/>
+        <span class="h1-ly">Ly_</span>
+      </h1>
+      <p class="hero-desc">Capturing the world through a lens. Decoding the future through a screen. Where every frame has a story and every byte matters.</p>
+      <div class="hero-tags">
+        <span class="tag t-active">📸 Photography</span>
+        <span class="tag">💻 Tech</span>
+        <span class="tag">🤖 AI & Gadgets</span>
+        <span class="tag">📡 News</span>
+      </div>
+      <div class="hero-btns">
+        <a href="https://www.instagram.com/shotvibely/" target="_blank" rel="noopener" class="btn-p">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <span>Follow on Instagram</span>
+        </a>
+        <a href="#content" class="btn-s">
+          Explore Content
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="logo-frame">
+        <img src="img.jpeg" alt="ShotVibely featured photo"/>
+        <div class="logo-corner lc-tl"></div>
+        <div class="logo-corner lc-tr"></div>
+        <div class="logo-corner lc-bl"></div>
+        <div class="logo-corner lc-br"></div>
+        <div class="logo-scan"></div>
+        <div class="logo-badge">see the world differently</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span class="ticker-item"><em>✦</em>Photography</span>
+      <span class="ticker-item"><em>✦</em>Tech News</span>
+      <span class="ticker-item"><em>✦</em>AI & Gadgets</span>
+      <span class="ticker-item"><em>✦</em>Cinematic Shots</span>
+      <span class="ticker-item"><em>✦</em>Camera Reviews</span>
+      <span class="ticker-item"><em>✦</em>Digital Culture</span>
+      <span class="ticker-item"><em>✦</em>Innovation</span>
+      <span class="ticker-item"><em>✦</em>Visual Stories</span>
+      <span class="ticker-item"><em>✦</em>Photography</span>
+      <span class="ticker-item"><em>✦</em>Tech News</span>
+      <span class="ticker-item"><em>✦</em>AI & Gadgets</span>
+      <span class="ticker-item"><em>✦</em>Cinematic Shots</span>
+      <span class="ticker-item"><em>✦</em>Camera Reviews</span>
+      <span class="ticker-item"><em>✦</em>Digital Culture</span>
+      <span class="ticker-item"><em>✦</em>Innovation</span>
+      <span class="ticker-item"><em>✦</em>Visual Stories</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <p class="sec-eye reveal">About</p>
+    <h2 class="sec-h reveal">Half photographer.<br/>Half tech nerd.<br/><span style="color:var(--muted)">Fully obsessed.</span></h2>
+    <div class="about-wrap">
+      <div class="about-img-wrap reveal">
+        <img src="logo.png" alt="ShotVibely brand" class="about-img"/>
+        <div class="about-img-overlay"></div>
+        <div class="about-tag-float">
+          <div class="atf-label">Page identity</div>
+          <div class="atf-val">@shotvibely</div>
+        </div>
+      </div>
+      <div class="about-text reveal">
+        <p>ShotVibely is a creative content page living at the intersection of photography and technology. Every frame captured tells a story — and every byte shared decodes the future.</p>
+        <p>From cinematic street shots to the latest in AI, cameras, and gadgets — this is a space built for visual thinkers and digital explorers who see the world differently.</p>
+        <a href="https://www.instagram.com/shotvibely/" target="_blank" rel="noopener" class="btn-p" style="margin-top:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <span>See the feed</span>
+        </a>
+        <div class="about-stats">
+          <div class="a-stat"><div class="a-stat-n">∞</div><div class="a-stat-l">Shots taken</div></div>
+          <div class="a-stat"><div class="a-stat-n">24/7</div><div class="a-stat-l">Tech coverage</div></div>
+          <div class="a-stat"><div class="a-stat-n">1</div><div class="a-stat-l">Unique vision</div></div>
+          <div class="a-stat"><div class="a-stat-n">∞</div><div class="a-stat-l">Good vibes</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT PILLARS -->
+  <section class="section" id="content">
+    <p class="sec-eye reveal">Content</p>
+    <h2 class="sec-h reveal">What we cover</h2>
+    <div class="pillars-grid">
+      <div class="pillar pi1 reveal">
+        <div class="pillar-no n1">01 —</div>
+        <div class="pillar-icon">📸</div>
+        <div class="pillar-title">Photography</div>
+        <p class="pillar-desc">Cinematic frames, street photography, composition tips, gear breakdowns and visual storytelling that makes you feel something.</p>
+      </div>
+      <div class="pillar pi2 reveal">
+        <div class="pillar-no n2">02 —</div>
+        <div class="pillar-icon">💻</div>
+        <div class="pillar-title">Tech & Gadgets</div>
+        <p class="pillar-desc">Latest in AI, cameras, smartphones and the tools reshaping how we create, consume and connect with the world around us.</p>
+      </div>
+      <div class="pillar pi3 reveal">
+        <div class="pillar-no n3">03 —</div>
+        <div class="pillar-icon">📡</div>
+        <div class="pillar-title">Tech News</div>
+        <p class="pillar-desc">Breaking tech stories, product launches and digital culture — simplified, visual, and always worth your scroll.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section" id="gallery">
+    <p class="sec-eye reveal">Gallery</p>
+    <h2 class="sec-h reveal">The feed, framed.</h2>
+    <div class="gallery-grid reveal">
+      <div class="g-item g-big">
+        <img src="logo.png" alt="ShotVibely featured"/>
+        <div class="g-overlay"></div>
+      </div>
+      <div class="g-item g2b"><div class="g-overlay"></div><span class="g-ico">💻</span><span class="g-lbl">Tech picks</span></div>
+      <div class="g-item g3b"><div class="g-overlay"></div><span class="g-ico">🤖</span><span class="g-lbl">AI news</span></div>
+      <div class="g-item g4b"><div class="g-overlay"></div><span class="g-ico">🌆</span><span class="g-lbl">Urban frames</span></div>
+      <div class="g-item g5b"><div class="g-overlay"></div><span class="g-ico">📡</span><span class="g-lbl">Stories</span></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-wrap reveal">
+    <img src="logo.png" alt="ShotVibely" class="cta-logo"/>
+    <h2 class="cta-h">Ready to vibe<br/><span>differently?</span></h2>
+    <p class="cta-p">Follow along for daily shots, tech stories, and a feed that hits different every single time.</p>
+    <a href="https://www.instagram.com/shotvibely/" target="_blank" rel="noopener" class="btn-p">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      <span>Follow @shotvibely</span>
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="#" class="foot-brand">
+      <img src="logo.png" alt="ShotVibely" class="foot-logo"/>
+      <span class="foot-name">shotvibely</span>
+    </a>
+    <span class="foot-copy">© 2026 shotvibely. All rights reserved.</span>
+    <a href="https://www.instagram.com/shotvibely/" target="_blank" rel="noopener" class="foot-ig">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      instagram.com/shotvibely
+    </a>
+  </footer>
+
+  <script>
+    const cur = document.getElementById('cur');
+    const curR = document.getElementById('curR');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+    (function loop(){
+      cur.style.transform=`translate(${mx-4}px,${my-4}px)`;
+      rx+=(mx-rx)*.13; ry+=(my-ry)*.13;
+      curR.style.transform=`translate(${rx-16}px,${ry-16}px)`;
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll('a,button').forEach(el=>{
+      el.addEventListener('mouseenter',()=>{ cur.classList.add('hov'); curR.classList.add('hov'); });
+      el.addEventListener('mouseleave',()=>{ cur.classList.remove('hov'); curR.classList.remove('hov'); });
+    });
+
+    const obs = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('vis'); });
+    },{threshold:0.12});
+    document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  </script>
+</body>
+</html>
